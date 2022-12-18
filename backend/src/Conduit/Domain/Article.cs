@@ -24,7 +24,7 @@ namespace Conduit.Domain
         public List<Comment> Comments { get; set; } = new();
 
         [NotMapped]
-        public bool Favorited => ArticleFavorites?.Any() ?? false;
+        public bool Favorited { get; set; }
 
         [NotMapped]
         public int FavoritesCount => ArticleFavorites?.Count ?? 0;

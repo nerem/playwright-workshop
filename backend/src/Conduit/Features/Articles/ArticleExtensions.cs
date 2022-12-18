@@ -1,5 +1,7 @@
+using System.Collections.Generic;
 using System.Linq;
 using Conduit.Domain;
+using Conduit.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Conduit.Features.Articles
@@ -13,6 +15,12 @@ namespace Conduit.Features.Articles
                 .Include(x => x.ArticleFavorites)
                 .Include(x => x.ArticleTags)
                 .AsNoTracking();
+        }
+
+        public static void AddIsFavoriteToggleInPlace(this Article article, Person currentPerson)
+        {
+            article.Favorited =
+                article.ArticleFavorites.Any(favorite => favorite.PersonId == currentPerson.PersonId);
         }
     }
 }

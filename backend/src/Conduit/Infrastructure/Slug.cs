@@ -5,7 +5,7 @@ namespace Conduit.Infrastructure
     // https://stackoverflow.com/questions/2920744/url-slugify-algorithm-in-c
     public static class Slug
     {
-        public static string? GenerateSlug(this string? phrase)
+        public static string? GenerateSlug(this string? phrase, int articleId)
         {
             if (phrase is null)
             {
@@ -19,7 +19,7 @@ namespace Conduit.Infrastructure
             // cut and trim
             str = str.Substring(0, str.Length <= 45 ? str.Length : 45).Trim();
             str = Regex.Replace(str, @"\s", "-"); // hyphens
-            return str;
+            return str + "-" + articleId;
         }
     }
 }
