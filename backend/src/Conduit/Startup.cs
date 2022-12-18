@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text.Json.Serialization;
 using AutoMapper;
 using Conduit.Features.Profiles;
+using Conduit.Features.Tags;
 using Conduit.Infrastructure;
 using Conduit.Infrastructure.Errors;
 using Conduit.Infrastructure.Security;
@@ -123,6 +124,7 @@ namespace Conduit
             services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
             services.AddScoped<ICurrentUserAccessor, CurrentUserAccessor>();
             services.AddScoped<IProfileReader, ProfileReader>();
+            services.AddScoped<TagsCleanup>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             services.AddJwt();

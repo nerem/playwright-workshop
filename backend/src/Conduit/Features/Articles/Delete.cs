@@ -1,6 +1,7 @@
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using Conduit.Features.Tags;
 using Conduit.Infrastructure;
 using Conduit.Infrastructure.Errors;
 using FluentValidation;
@@ -24,10 +25,12 @@ namespace Conduit.Features.Articles
         public class QueryHandler : IRequestHandler<Command>
         {
             private readonly ConduitContext _context;
+            private readonly TagsCleanup _tagsCleanup;
 
-            public QueryHandler(ConduitContext context)
+            public QueryHandler(ConduitContext context, TagsCleanup tagsCleanup)
             {
                 _context = context;
+                _tagsCleanup = tagsCleanup;
             }
 
             public async Task<Unit> Handle(Command message, CancellationToken cancellationToken)
@@ -42,6 +45,9 @@ namespace Conduit.Features.Articles
 
                 _context.Articles.Remove(article);
                 await _context.SaveChangesAsync(cancellationToken);
+
+                await _tagsCleanup.RemoveAllTagsThatAreNotUsedInAnyArticle();
+
                 return Unit.Value;
             }
         }

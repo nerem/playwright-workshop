@@ -60,8 +60,11 @@ namespace Conduit.Features.Favorites
                     await _context.SaveChangesAsync(cancellationToken);
                 }
 
-                return new ArticleEnvelope(await _context.Articles.GetAllData()
-                    .FirstOrDefaultAsync(x => x.ArticleId == article.ArticleId, cancellationToken));
+                var articleWithFullData = await _context.Articles.GetAllData()
+                    .FirstOrDefaultAsync(x => x.ArticleId == article.ArticleId, cancellationToken);
+                articleWithFullData.AddIsFavoriteToggleInPlace(person);
+
+                return new ArticleEnvelope(articleWithFullData);
             }
         }
     }

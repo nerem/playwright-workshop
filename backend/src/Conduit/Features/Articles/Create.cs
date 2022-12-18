@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Conduit.Domain;
+using Conduit.Features.Tags;
 using Conduit.Infrastructure;
 using FluentValidation;
 using MediatR;
@@ -48,11 +49,13 @@ namespace Conduit.Features.Articles
         {
             private readonly ConduitContext _context;
             private readonly ICurrentUserAccessor _currentUserAccessor;
+            private readonly TagsCleanup _tagsCleanup;
 
-            public Handler(ConduitContext context, ICurrentUserAccessor currentUserAccessor)
+            public Handler(ConduitContext context, ICurrentUserAccessor currentUserAccessor, TagsCleanup tagsCleanup)
             {
                 _context = context;
                 _currentUserAccessor = currentUserAccessor;
+                _tagsCleanup = tagsCleanup;
             }
 
             public async Task<ArticleEnvelope> Handle(Command message, CancellationToken cancellationToken)
@@ -83,7 +86,6 @@ namespace Conduit.Features.Articles
                     UpdatedAt = DateTime.UtcNow,
                     Description = message.Article.Description,
                     Title = message.Article.Title,
-                    Slug = message.Article.Title.GenerateSlug()
                 };
                 await _context.Articles.AddAsync(article, cancellationToken);
 
@@ -94,6 +96,14 @@ namespace Conduit.Features.Articles
                 }), cancellationToken);
 
                 await _context.SaveChangesAsync(cancellationToken);
+
+                // the article Id of a new article is handled by the db and only known after it is inserted already
+                article.Slug = message.Article.Title.GenerateSlug(article.ArticleId);
+
+                await _context.SaveChangesAsync(cancellationToken);
+
+                // not strictly necessary when creating a new article, but one redundant clean up does not hurt
+                await _tagsCleanup.RemoveAllTagsThatAreNotUsedInAnyArticle();
 
                 return new ArticleEnvelope(article);
             }
