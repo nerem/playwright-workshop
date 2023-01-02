@@ -59,7 +59,7 @@ namespace Conduit.Features.Users
             public async Task<UserEnvelope> Handle(Command message, CancellationToken cancellationToken)
             {
                 var currentUsername = _currentUserAccessor.GetCurrentUsername();
-                var person = await _context.Persons.Where(x => x.Username == currentUsername).FirstOrDefaultAsync(cancellationToken);
+                var person = await _context.Persons.Where(x => x.Username == currentUsername).SingleAsync(cancellationToken);
 
                 person.Username = message.User.Username ?? person.Username;
                 person.Email = message.User.Email ?? person.Email;

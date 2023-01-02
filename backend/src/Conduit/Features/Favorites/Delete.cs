@@ -42,7 +42,7 @@ namespace Conduit.Features.Favorites
                     throw new RestException(HttpStatusCode.NotFound, new { Article = Constants.NOT_FOUND });
                 }
 
-                var person = await _context.Persons.FirstOrDefaultAsync(x => x.Username == _currentUserAccessor.GetCurrentUsername(), cancellationToken);
+                var person = await _context.Persons.SingleAsync(x => x.Username == _currentUserAccessor.GetCurrentUsername(), cancellationToken);
 
                 var favorite = await _context.ArticleFavorites.FirstOrDefaultAsync(x => x.ArticleId == article.ArticleId && x.PersonId == person.PersonId, cancellationToken);
 
@@ -53,7 +53,7 @@ namespace Conduit.Features.Favorites
                 }
 
                 var articleWithFullData = await _context.Articles.GetAllData()
-                    .FirstOrDefaultAsync(x => x.ArticleId == article.ArticleId, cancellationToken);
+                    .SingleAsync(x => x.ArticleId == article.ArticleId, cancellationToken);
                 articleWithFullData.AddIsFavoriteToggleInPlace(person);
 
                 return new ArticleEnvelope(articleWithFullData);

@@ -46,7 +46,7 @@ namespace Conduit.Features.Followers
 
                 var observer = await _context.Persons.FirstOrDefaultAsync(x => x.Username == _currentUserAccessor.GetCurrentUsername(), cancellationToken);
 
-                var followedPeople = await _context.FollowedPeople.FirstOrDefaultAsync(x => x.ObserverId == observer.PersonId && x.TargetId == target.PersonId, cancellationToken);
+                var followedPeople = await _context.FollowedPeople.FirstOrDefaultAsync(x => x.ObserverId == observer!.PersonId && x.TargetId == target.PersonId, cancellationToken);
 
                 if (followedPeople != null)
                 {

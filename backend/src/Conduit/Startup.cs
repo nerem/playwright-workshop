@@ -7,6 +7,7 @@ using Conduit.Features.Tags;
 using Conduit.Infrastructure;
 using Conduit.Infrastructure.Errors;
 using Conduit.Infrastructure.Security;
+using FluentValidation;
 using FluentValidation.AspNetCore;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
@@ -37,7 +38,7 @@ namespace Conduit
         {
             services.AddMediatR(Assembly.GetExecutingAssembly());
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationPipelineBehavior<,>));
-            services.AddScoped(typeof(IPipelineBehavior<,>), typeof(DBContextTransactionPipelineBehavior<,>));
+            services.AddScoped(typeof(IPipelineBehavior<,>), typeof(DbContextTransactionPipelineBehavior<,>));
 
             // take the connection string from the environment variable or use hard-coded database name
             var connectionString = _config.GetValue<string>("ASPNETCORE_Conduit_ConnectionString") ??
@@ -110,11 +111,11 @@ namespace Conduit
                 {
                     opt.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.Never;
                     opt.JsonSerializerOptions.Converters.Add(new DateTimeConverter());
-                })
-                .AddFluentValidation(cfg =>
-                {
-                    cfg.RegisterValidatorsFromAssemblyContaining<Startup>();
                 });
+
+            services.AddFluentValidationAutoValidation();
+            services.AddFluentValidationClientsideAdapters();
+            services.AddValidatorsFromAssemblyContaining<Startup>();
 
             services.AddAutoMapper(GetType().Assembly);
 

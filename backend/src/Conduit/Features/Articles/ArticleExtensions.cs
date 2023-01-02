@@ -36,10 +36,10 @@ namespace Conduit.Features.Articles
             return str + "-" + article.ArticleId;
         }
 
-        public static void AddIsFavoriteToggleInPlace(this Article article, Person currentPerson)
+        public static void AddIsFavoriteToggleInPlace(this Article article, Person? currentPerson)
         {
             article.Favorited =
-                article.ArticleFavorites.Any(favorite => favorite.PersonId == currentPerson.PersonId);
+                article.ArticleFavorites.Any(favorite => favorite.PersonId == currentPerson?.PersonId);
         }
 
         public static void AddIsFollowingAuthorInPlace(this Article article, bool following)
