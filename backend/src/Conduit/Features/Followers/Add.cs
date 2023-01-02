@@ -45,9 +45,9 @@ namespace Conduit.Features.Followers
                     throw new RestException(HttpStatusCode.NotFound, new { User = Constants.NOT_FOUND });
                 }
 
-                var observer = await _context.Persons.FirstOrDefaultAsync(x => x.Username == _currentUserAccessor.GetCurrentUsername(), cancellationToken);
+                var observer = await _context.Persons.SingleAsync(x => x.Username == _currentUserAccessor.GetCurrentUsername(), cancellationToken);
 
-                var followedPeople = await _context.FollowedPeople.FirstOrDefaultAsync(x => x.ObserverId == observer.PersonId && x.TargetId == target.PersonId, cancellationToken);
+                var followedPeople = await _context.FollowedPeople.FirstOrDefaultAsync(x => x.ObserverId == observer!.PersonId && x.TargetId == target.PersonId, cancellationToken);
 
                 if (followedPeople == null)
                 {

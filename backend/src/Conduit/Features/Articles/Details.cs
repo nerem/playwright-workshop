@@ -49,7 +49,7 @@ namespace Conduit.Features.Articles
                 if (_currentUserAccessor.GetCurrentUsername() is { } currentUserName)
                 {
                     var currentPerson = await _context.Persons.AsNoTracking()
-                        .FirstOrDefaultAsync(x => x.Username == currentUserName, cancellationToken);
+                        .SingleOrDefaultAsync(x => x.Username == currentUserName, cancellationToken);
                     article.AddIsFavoriteToggleInPlace(currentPerson);
                     article.AddIsFollowingAuthorInPlace(await _profileReader.IsFollowedByCurrentUser(currentUserName,
                         article.Author!.PersonId, cancellationToken));

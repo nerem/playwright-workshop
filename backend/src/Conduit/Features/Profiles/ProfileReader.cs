@@ -46,7 +46,7 @@ namespace Conduit.Features.Profiles
             var currentPerson = await _context.Persons
                 .Include(x => x.FollowingPersons)
                 .Include(x => x.FollowerPersons)
-                .FirstOrDefaultAsync(x => x.Username == currentUserName, cancellationToken);
+                .SingleAsync(x => x.Username == currentUserName, cancellationToken);
 
             if (currentPerson.FollowingPersons.Any(x => x.TargetId == otherPersonId))
             {
