@@ -29,7 +29,7 @@ namespace Conduit.Infrastructure.Security
                 _jwtOptions.Audience,
                 claims,
                 _jwtOptions.NotBefore,
-                _jwtOptions.Expiration,
+                _jwtOptions.IssuedAt.Add(TimeSpan.FromMinutes(600)),
                 _jwtOptions.SigningCredentials);
 
             var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
