@@ -26,6 +26,15 @@ namespace Conduit.Features.Articles
 
             public string[]? TagList { get; set; }
         }
+        public class ArticleDataValidator : AbstractValidator<ArticleData>
+        {
+            public ArticleDataValidator()
+            {
+                RuleFor(x => x.Title).NotNull().NotEmpty();
+                RuleFor(x => x.Description).NotNull().NotEmpty();
+                RuleFor(x => x.Body).NotNull().NotEmpty();
+            }
+        }
 
         public record Command(Model Model, string Slug) : IRequest<ArticleEnvelope>;
 
@@ -35,7 +44,7 @@ namespace Conduit.Features.Articles
         {
             public CommandValidator()
             {
-                RuleFor(x => x.Model.Article).NotNull();
+                RuleFor(x => x.Model.Article).NotNull().SetValidator(new ArticleDataValidator());
             }
         }
 

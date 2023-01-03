@@ -20,7 +20,7 @@ namespace Conduit.Features.Comments
         {
             public CommandValidator()
             {
-                RuleFor(x => x.Model.Comment.Body).NotEmpty();
+                RuleFor(x => x.Model.Comment.Body).NotNull().NotEmpty();
             }
         }
 
