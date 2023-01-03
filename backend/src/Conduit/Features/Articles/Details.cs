@@ -24,10 +24,12 @@ namespace Conduit.Features.Articles
         public class QueryHandler : IRequestHandler<Query, ArticleEnvelope>
         {
             private readonly ConduitContext _context;
+            private readonly ICurrentUserAccessor _currentUserAccessor;
 
-            public QueryHandler(ConduitContext context)
+            public QueryHandler(ConduitContext context, ICurrentUserAccessor currentUserAccessor)
             {
                 _context = context;
+                _currentUserAccessor = currentUserAccessor;
             }
 
             public async Task<ArticleEnvelope> Handle(Query message, CancellationToken cancellationToken)
@@ -39,6 +41,14 @@ namespace Conduit.Features.Articles
                 {
                     throw new RestException(HttpStatusCode.NotFound, new { Article = Constants.NOT_FOUND });
                 }
+
+                if (_currentUserAccessor.GetCurrentUsername() is { } currentUserName)
+                {
+                    var currentPerson = await _context.Persons.AsNoTracking()
+                        .FirstOrDefaultAsync(x => x.Username == currentUserName, cancellationToken);
+                    article.AddIsFavoriteToggleInPlace(currentPerson);
+                }
+
                 return new ArticleEnvelope(article);
             }
         }
