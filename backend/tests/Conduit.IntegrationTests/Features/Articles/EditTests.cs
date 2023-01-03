@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Conduit.Features.Articles;
+using Conduit.Features.Tags;
 using Xunit;
 
 namespace Conduit.IntegrationTests.Features.Articles
@@ -25,13 +26,14 @@ namespace Conduit.IntegrationTests.Features.Articles
                 Title = "Updated " + createdArticle.Title,
                 Description = "Updated" + createdArticle.Description,
                 Body = "Updated" + createdArticle.Body,
-            }), createdArticle.Slug);
+            }), createdArticle.Slug!);
             // remove the first tag and add a new tag
             command.Model.Article.TagList = new string[] { createdArticle.TagList[1], "tag3" };
 
             var dbContext = GetDbContext();
+            var tagsCleanUp = GetRequiredService<TagsCleanup>();
 
-            var articleEditHandler = new Edit.Handler(dbContext);
+            var articleEditHandler = new Edit.Handler(dbContext, tagsCleanUp);
             var edited = await articleEditHandler.Handle(command, new System.Threading.CancellationToken());
 
             Assert.NotNull(edited);

@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Conduit.Features.Articles;
+using Microsoft.EntityFrameworkCore;
 using Xunit;
 
 namespace Conduit.IntegrationTests.Features.Articles
@@ -22,7 +23,19 @@ namespace Conduit.IntegrationTests.Features.Articles
 
             Assert.NotNull(article);
             Assert.Equal(article.Title, command.Article.Title);
-            Assert.Equal(article.TagList.Count(), command.Article.TagList.Count());
+            Assert.Equal(article.TagList.Count(), command.Article.TagList!.Count());
+
+            var dbArticleTags = await ExecuteDbContextAsync(
+                db => db.ArticleTags.Where(a => a.ArticleId == article.ArticleId)
+                    .ToListAsync()
+            );
+            Assert.True(dbArticleTags.Count == 2);
+
+            var dbTags = await ExecuteDbContextAsync(
+                db => db.Tags.Where(t => article.TagList.Contains(t.TagId))
+                    .ToListAsync()
+            );
+            Assert.True(dbTags.Count == 2);
         }
     }
 }

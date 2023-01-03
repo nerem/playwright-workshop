@@ -46,6 +46,11 @@ namespace Conduit.IntegrationTests
             return _provider.GetRequiredService<ConduitContext>();
         }
 
+        public T GetRequiredService<T>() where T: notnull
+        {
+            return _provider.GetRequiredService<T>();
+        }
+
         public void Dispose()
         {
             File.Delete(DbName);
