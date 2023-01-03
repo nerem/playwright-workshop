@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Conduit.Features.Articles;
+using Conduit.Features.Tags;
 using Conduit.IntegrationTests.Features.Comments;
 using Conduit.IntegrationTests.Features.Users;
 using Microsoft.EntityFrameworkCore;
@@ -18,20 +19,21 @@ namespace Conduit.IntegrationTests.Features.Articles
                 Title = "Test article dsergiu77",
                 Description = "Description of the test article",
                 Body = "Body of the test article",
-
             });
 
             var article = await ArticleHelpers.CreateArticle(this, createCmd);
-            var slug = article.Slug;
+            var slug = article.Slug!;
 
             var deleteCmd = new Delete.Command(slug);
 
             var dbContext = GetDbContext();
+            var tagsCleanUp = GetRequiredService<TagsCleanup>();
 
-            var articleDeleteHandler = new Delete.QueryHandler(dbContext);
+            var articleDeleteHandler = new Delete.QueryHandler(dbContext, tagsCleanUp);
             await articleDeleteHandler.Handle(deleteCmd, new System.Threading.CancellationToken());
 
-            var dbArticle = await ExecuteDbContextAsync(db => db.Articles.Where(d => d.Slug == deleteCmd.Slug).SingleOrDefaultAsync());
+            var dbArticle = await ExecuteDbContextAsync(db =>
+                db.Articles.Where(d => d.Slug == deleteCmd.Slug).SingleOrDefaultAsync());
 
             Assert.Null(dbArticle);
         }
@@ -50,18 +52,26 @@ namespace Conduit.IntegrationTests.Features.Articles
             var article = await ArticleHelpers.CreateArticle(this, createCmd);
             var dbArticleWithTags = await ExecuteDbContextAsync(
                 db => db.Articles.Include(a => a.ArticleTags)
-                .Where(d => d.Slug == article.Slug).SingleOrDefaultAsync()
+                    .Where(d => d.Slug == article.Slug).SingleOrDefaultAsync()
             );
 
-            var deleteCmd = new Delete.Command(article.Slug);
+            var deleteCmd = new Delete.Command(article.Slug!);
 
             var dbContext = GetDbContext();
+            var tagsCleanUp = GetRequiredService<TagsCleanup>();
 
-            var articleDeleteHandler = new Delete.QueryHandler(dbContext);
+            var articleDeleteHandler = new Delete.QueryHandler(dbContext, tagsCleanUp);
             await articleDeleteHandler.Handle(deleteCmd, new System.Threading.CancellationToken());
 
-            var dbArticle = await ExecuteDbContextAsync(db => db.Articles.Where(d => d.Slug == deleteCmd.Slug).SingleOrDefaultAsync());
+            var dbArticle = await ExecuteDbContextAsync(db =>
+                db.Articles.Where(d => d.Slug == deleteCmd.Slug).SingleOrDefaultAsync());
             Assert.Null(dbArticle);
+            var dbArticleTags = await ExecuteDbContextAsync(db =>
+                db.ArticleTags.Where(d => d.ArticleId == dbArticleWithTags.ArticleId).SingleOrDefaultAsync());
+            Assert.Null(dbArticleTags);
+            var dbTags = await ExecuteDbContextAsync(db =>
+                 db.Tags.Where(t => dbArticleWithTags.TagList.Contains(t.TagId)).SingleOrDefaultAsync());
+            Assert.Null(dbTags);
         }
 
         [Fact]
@@ -77,7 +87,7 @@ namespace Conduit.IntegrationTests.Features.Articles
             var article = await ArticleHelpers.CreateArticle(this, createArticleCmd);
             var dbArticle = await ExecuteDbContextAsync(
                 db => db.Articles.Include(a => a.ArticleTags)
-                .Where(d => d.Slug == article.Slug).SingleOrDefaultAsync()
+                    .Where(d => d.Slug == article.Slug).SingleOrDefaultAsync()
             );
 
             var articleId = dbArticle.ArticleId;
@@ -86,7 +96,7 @@ namespace Conduit.IntegrationTests.Features.Articles
             // create article comment
             var createCommentCmd =
                 new Conduit.Features.Comments.Create.Command(
-                    new(new Conduit.Features.Comments.Create.CommentData("article comment")), slug);
+                    new(new Conduit.Features.Comments.Create.CommentData("article comment")), slug!);
 
             var comment = await CommentHelpers.CreateComment(this, createCommentCmd, UserHelpers.DefaultUserName);
 
@@ -94,11 +104,13 @@ namespace Conduit.IntegrationTests.Features.Articles
             var deleteCmd = new Delete.Command(slug);
 
             var dbContext = GetDbContext();
+            var tagsCleanUp = GetRequiredService<TagsCleanup>();
 
-            var articleDeleteHandler = new Delete.QueryHandler(dbContext);
+            var articleDeleteHandler = new Delete.QueryHandler(dbContext, tagsCleanUp);
             await articleDeleteHandler.Handle(deleteCmd, new System.Threading.CancellationToken());
 
-            var deleted = await ExecuteDbContextAsync(db => db.Articles.Where(d => d.Slug == deleteCmd.Slug).SingleOrDefaultAsync());
+            var deleted = await ExecuteDbContextAsync(db =>
+                db.Articles.Where(d => d.Slug == deleteCmd.Slug).SingleOrDefaultAsync());
             Assert.Null(deleted);
         }
     }

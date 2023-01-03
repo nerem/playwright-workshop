@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Conduit.Features.Articles;
+using Conduit.Features.Tags;
 using Conduit.IntegrationTests.Features.Users;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,8 +22,9 @@ namespace Conduit.IntegrationTests.Features.Articles
 
             var dbContext = fixture.GetDbContext();
             var currentAccessor = new StubCurrentUserAccessor(user.Username);
+            var tagsCleanUp = fixture.GetRequiredService<TagsCleanup>();
 
-            var articleCreateHandler = new Create.Handler(dbContext, currentAccessor);
+            var articleCreateHandler = new Create.Handler(dbContext, currentAccessor, tagsCleanUp);
             var created = await articleCreateHandler.Handle(command, new System.Threading.CancellationToken());
 
             var dbArticle = await fixture.ExecuteDbContextAsync(db => db.Articles.Where(a => a.ArticleId == created.Article.ArticleId)

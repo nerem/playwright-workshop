@@ -9,7 +9,7 @@ namespace Conduit.IntegrationTests.Features.Comments
     public static class CommentHelpers
     {
         /// <summary>
-        /// creates an article comment based on the given Create command. 
+        /// creates an article comment based on the given Create command.
         /// Creates a default user if parameter userName is empty.
         /// </summary>
         /// <param name="fixture"></param>
@@ -38,8 +38,7 @@ namespace Conduit.IntegrationTests.Features.Comments
             );
 
             var dbComment = dbArticleWithComments.Comments
-                .Where(c => c.ArticleId == dbArticleWithComments.ArticleId && c.Author == dbArticleWithComments.Author)
-                .FirstOrDefault();
+                .FirstOrDefault(c => c.ArticleId == dbArticleWithComments.ArticleId && c.Author == dbArticleWithComments.Author);
 
             return dbComment;
         }
