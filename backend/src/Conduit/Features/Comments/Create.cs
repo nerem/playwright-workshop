@@ -16,11 +16,11 @@ namespace Conduit.Features.Comments
         public record CommentData(string? Body);
         public record Command(Model Model, string Slug) : IRequest<CommentEnvelope>;
         public record Model(CommentData Comment) : IRequest<CommentEnvelope>;
-        public class CommandValidator : AbstractValidator<Command>
+        public class CommandValidator : AbstractValidator<Model>
         {
             public CommandValidator()
             {
-                RuleFor(x => x.Model.Comment.Body).NotNull().NotEmpty();
+                RuleFor(x => x.Comment.Body).NotNull().NotEmpty();
             }
         }
 
