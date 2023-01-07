@@ -33,6 +33,8 @@ namespace Conduit.Features.Users
             public CommandValidator()
             {
                 RuleFor(x => x.User).NotNull();
+                RuleFor(x => x.User.Email).NotNull().NotEmpty();
+                RuleFor(x => x.User.Username).NotNull().NotEmpty();
             }
         }
 

@@ -27,6 +27,10 @@ namespace Conduit.Infrastructure
             // Adding a uniqueness constraint to the slug since otherwise accidental duplicates might lead to confusing behavior
             modelBuilder.Entity<Article>().HasIndex(a => a.Slug).IsUnique();
 
+            // Adding uniqueness constraints to email and username since this is assumed internally at many places already
+            modelBuilder.Entity<Person>().HasIndex(p => p.Email).IsUnique();
+            modelBuilder.Entity<Person>().HasIndex(p => p.Username).IsUnique();
+
             modelBuilder.Entity<ArticleTag>(b =>
             {
                 b.HasKey(t => new { t.ArticleId, t.TagId });
