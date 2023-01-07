@@ -1,14 +1,14 @@
 import axios from 'axios';
 import React from 'react';
-import { updateSettings } from '../../../services/conduit';
-import { store } from '../../../state/store';
-import { useStore } from '../../../state/storeHooks';
-import { UserSettings } from '../../../types/user';
-import { buildGenericFormField } from '../../../types/genericFormField';
-import { loadUser, logout } from '../../App/App.slice';
-import { GenericForm } from '../../GenericForm/GenericForm';
-import { SettingsState, startUpdate, updateErrors, updateField } from './Settings.slice';
-import { ContainerPage } from '../../ContainerPage/ContainerPage';
+import {updateSettings} from '../../../services/conduit';
+import {store} from '../../../state/store';
+import {useStore} from '../../../state/storeHooks';
+import {loadUserIntoApp, UserSettings} from '../../../types/user';
+import {buildGenericFormField} from '../../../types/genericFormField';
+import {logout} from '../../App/App.slice';
+import {GenericForm} from '../../GenericForm/GenericForm';
+import {SettingsState, startUpdate, updateErrors, updateField} from './Settings.slice';
+import {ContainerPage} from '../../ContainerPage/ContainerPage';
 
 export interface SettingsField {
     name: keyof UserSettings;
@@ -18,7 +18,7 @@ export interface SettingsField {
 }
 
 export function Settings() {
-    const { user, errors, updating } = useStore(({ settings }) => settings);
+    const {user, errors, updating} = useStore(({settings}) => settings);
 
     return (
         <div className="settings-page">
@@ -28,26 +28,26 @@ export function Settings() {
 
                     <GenericForm
                         disabled={updating}
-                        formObject={{ ...user }}
+                        formObject={{...user}}
                         submitButtonText="Update Settings"
                         errors={errors}
                         onChange={onUpdateField}
                         onSubmit={onUpdateSettings(user)}
                         fields={[
-                            buildGenericFormField({ name: 'image', placeholder: 'URL of profile picture' }),
-                            buildGenericFormField({ name: 'username', placeholder: 'Your Name' }),
+                            buildGenericFormField({name: 'image', placeholder: 'URL of profile picture'}),
+                            buildGenericFormField({name: 'username', placeholder: 'Your Name'}),
                             buildGenericFormField({
                                 name: 'bio',
                                 placeholder: 'Short bio about you',
                                 rows: 8,
                                 fieldType: 'textarea',
                             }),
-                            buildGenericFormField({ name: 'email', placeholder: 'Email' }),
-                            buildGenericFormField({ name: 'password', placeholder: 'Password', type: 'password' }),
+                            buildGenericFormField({name: 'email', placeholder: 'Email'}),
+                            buildGenericFormField({name: 'password', placeholder: 'Password', type: 'password'}),
                         ]}
                     />
 
-                    <hr />
+                    <hr/>
                     <button className="btn btn-outline-danger" onClick={_logout}>
                         Or click here to logout.
                     </button>
@@ -58,7 +58,7 @@ export function Settings() {
 }
 
 function onUpdateField(name: string, value: string) {
-    store.dispatch(updateField({ name: name as keyof SettingsState['user'], value }));
+    store.dispatch(updateField({name: name as keyof SettingsState['user'], value}));
 }
 
 function onUpdateSettings(user: UserSettings) {
@@ -70,7 +70,9 @@ function onUpdateSettings(user: UserSettings) {
         result.match({
             err: (e) => store.dispatch(updateErrors(e)),
             ok: (user) => {
-                store.dispatch(loadUser(user));
+                // Since an edit in the BE of the userName might/will trigger return a new token, this is added here to all
+                // subsequent headers.
+                loadUserIntoApp(user);
                 location.hash = '/';
             },
         });
