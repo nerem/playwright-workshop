@@ -1,11 +1,11 @@
-import { store } from '../../../state/store';
-import { Settings } from './Settings';
-import { initializeSettings, startUpdate, updateErrors } from './Settings.slice';
-import { act, fireEvent, render, screen } from '@testing-library/react';
-import { updateSettings } from '../../../services/conduit';
-import { Err, Ok } from '@hqoss/monads';
+import {store} from '../../../state/store';
+import {Settings} from './Settings';
+import {initializeSettings, startUpdate, updateErrors} from './Settings.slice';
+import {act, fireEvent, render, screen} from '@testing-library/react';
+import {updateSettings} from '../../../services/conduit';
+import {Err, Ok} from '@hqoss/monads';
 import axios from 'axios';
-import { loadUser } from '../../App/App.slice';
+import {loadUser} from '../../App/App.slice';
 
 jest.mock('../../../services/conduit.ts');
 jest.mock('axios');
@@ -15,18 +15,18 @@ const mockedUpdateSettings = updateSettings as jest.Mock<ReturnType<typeof updat
 beforeEach(() => {
     act(() => {
         store.dispatch(initializeSettings());
-        render(<Settings />);
+        render(<Settings/>);
     });
 });
 
 describe('Settings', () => {
     it('Should update user fields', async () => {
         await act(async () => {
-            fireEvent.change(screen.getByPlaceholderText('URL of profile picture'), { target: { value: 'testImage' } });
-            fireEvent.change(screen.getByPlaceholderText('Your Name'), { target: { value: 'testUsername' } });
-            fireEvent.change(screen.getByPlaceholderText('Short bio about you'), { target: { value: 'testBio' } });
-            fireEvent.change(screen.getByPlaceholderText('Email'), { target: { value: 'testEmail' } });
-            fireEvent.change(screen.getByPlaceholderText('Password'), { target: { value: 'testPassword' } });
+            fireEvent.change(screen.getByPlaceholderText('URL of profile picture'), {target: {value: 'testImage'}});
+            fireEvent.change(screen.getByPlaceholderText('Your Name'), {target: {value: 'testUsername'}});
+            fireEvent.change(screen.getByPlaceholderText('Short bio about you'), {target: {value: 'testBio'}});
+            fireEvent.change(screen.getByPlaceholderText('Email'), {target: {value: 'testEmail'}});
+            fireEvent.change(screen.getByPlaceholderText('Password'), {target: {value: 'testPassword'}});
         });
 
         expect(store.getState().settings.user.image).toMatch('testImage');
@@ -38,7 +38,7 @@ describe('Settings', () => {
 
     it('Should show errors', async () => {
         await act(async () => {
-            store.dispatch(updateErrors({ 'email or password': ['is invalid', 'is empty'] }));
+            store.dispatch(updateErrors({'email or password': ['is invalid', 'is empty']}));
         });
 
         expect(screen.getByText('email or password is invalid')).toBeInTheDocument();
@@ -46,7 +46,7 @@ describe('Settings', () => {
     });
 
     it('Should disable fields during update and enabled afterwards with errors', async () => {
-        mockedUpdateSettings.mockResolvedValueOnce(Err({ 'email or password': ['is invalid2', 'is empty3'] }));
+        mockedUpdateSettings.mockResolvedValueOnce(Err({'email or password': ['is invalid2', 'is empty3']}));
 
         await act(async () => {
             store.dispatch(startUpdate());
@@ -93,6 +93,25 @@ describe('Settings', () => {
 
         expect(location.hash).toMatch('#/');
         expect(store.getState().app.user.unwrap().email).toMatch('jake@jake.jakesettings');
+    });
+
+    it('Should update token if settings update succeeds', async () => {
+        mockedUpdateSettings.mockResolvedValueOnce(
+            Ok({
+                email: 'jake@jake.jakesettings',
+                token: 'new.jwt.token.here',
+                username: 'newUserName',
+                bio: null,
+                image: null,
+            })
+        );
+
+        await act(async () => {
+            fireEvent.click(screen.getByText('Update Settings'));
+        });
+
+        expect(localStorage.getItem('token')).toMatch('new.jwt.token.here');
+        expect(axios.defaults.headers.Authorization).toMatch('Token new.jwt.token.here');
     });
 
     it('Should logout', async () => {
