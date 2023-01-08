@@ -1,7 +1,5 @@
-using System.Collections.Generic;
 using System.Linq;
 using Conduit.Domain;
-using Conduit.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Conduit.Features.Articles
@@ -21,6 +19,11 @@ namespace Conduit.Features.Articles
         {
             article.Favorited =
                 article.ArticleFavorites.Any(favorite => favorite.PersonId == currentPerson.PersonId);
+        }
+
+        public static void AddIsFollowingAuthorInPlace(this Article article, bool following)
+        {
+            article.Author!.Following = following;
         }
     }
 }

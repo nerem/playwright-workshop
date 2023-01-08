@@ -68,7 +68,7 @@ namespace Conduit.Infrastructure
                 // Message = Introducing FOREIGN KEY constraint 'FK_FollowedPeople_Persons_TargetId' on table 'FollowedPeople' may cause cycles or multiple cascade paths.Specify ON DELETE NO ACTION or ON UPDATE NO ACTION, or modify other FOREIGN KEY constraints.
                 // Could not create constraint or index. See previous errors.
                 b.HasOne(pt => pt.Observer)
-                    .WithMany(p => p!.Following)
+                    .WithMany(p => p!.FollowingPersons)
                     .HasForeignKey(pt => pt.ObserverId)
                     .OnDelete(DeleteBehavior.Restrict);
 
@@ -79,7 +79,7 @@ namespace Conduit.Infrastructure
                 // Message = Introducing FOREIGN KEY constraint 'FK_FollowingPeople_Persons_TargetId' on table 'FollowedPeople' may cause cycles or multiple cascade paths.Specify ON DELETE NO ACTION or ON UPDATE NO ACTION, or modify other FOREIGN KEY constraints.
                 // Could not create constraint or index. See previous errors.
                 b.HasOne(pt => pt.Target)
-                    .WithMany(t => t!.Followers)
+                    .WithMany(t => t!.FollowerPersons)
                     .HasForeignKey(pt => pt.TargetId)
                     .OnDelete(DeleteBehavior.Restrict);
             });

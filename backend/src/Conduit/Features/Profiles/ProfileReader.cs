@@ -24,8 +24,6 @@ namespace Conduit.Features.Profiles
 
         public async Task<ProfileEnvelope> ReadProfile(string username, CancellationToken cancellationToken)
         {
-            var currentUserName = _currentUserAccessor.GetCurrentUsername();
-
             var person = await _context.Persons.AsNoTracking()
                 .FirstOrDefaultAsync(x => x.Username == username, cancellationToken);
 
@@ -33,22 +31,29 @@ namespace Conduit.Features.Profiles
             {
                 throw new RestException(HttpStatusCode.NotFound, new { User = Constants.NOT_FOUND });
             }
+
             var profile = _mapper.Map<Domain.Person, Profile>(person);
 
-            if (currentUserName != null)
-            {
-                var currentPerson = await _context.Persons
-                    .Include(x => x.Following)
-                    .Include(x => x.Followers)
-                    .FirstOrDefaultAsync(x => x.Username == currentUserName, cancellationToken);
-
-                if (currentPerson.Following.Any(x => x.TargetId == person.PersonId))
-                {
-                    profile.IsFollowed = true;
-                }
-            }
+            var currentUserName = _currentUserAccessor.GetCurrentUsername();
+            profile.IsFollowed = currentUserName != null && await IsFollowedByCurrentUser(currentUserName, person.PersonId, cancellationToken);
 
             return new ProfileEnvelope(profile);
+        }
+
+        public async Task<bool> IsFollowedByCurrentUser(string currentUserName,
+            int otherPersonId, CancellationToken cancellationToken)
+        {
+            var currentPerson = await _context.Persons
+                .Include(x => x.FollowingPersons)
+                .Include(x => x.FollowerPersons)
+                .FirstOrDefaultAsync(x => x.Username == currentUserName, cancellationToken);
+
+            if (currentPerson.FollowingPersons.Any(x => x.TargetId == otherPersonId))
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }

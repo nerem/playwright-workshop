@@ -1,6 +1,7 @@
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using Conduit.Features.Profiles;
 using Conduit.Infrastructure;
 using Conduit.Infrastructure.Errors;
 using FluentValidation;
@@ -25,11 +26,14 @@ namespace Conduit.Features.Articles
         {
             private readonly ConduitContext _context;
             private readonly ICurrentUserAccessor _currentUserAccessor;
+            private readonly IProfileReader _profileReader;
 
-            public QueryHandler(ConduitContext context, ICurrentUserAccessor currentUserAccessor)
+            public QueryHandler(ConduitContext context, ICurrentUserAccessor currentUserAccessor,
+                IProfileReader profileReader)
             {
                 _context = context;
                 _currentUserAccessor = currentUserAccessor;
+                _profileReader = profileReader;
             }
 
             public async Task<ArticleEnvelope> Handle(Query message, CancellationToken cancellationToken)
@@ -47,6 +51,8 @@ namespace Conduit.Features.Articles
                     var currentPerson = await _context.Persons.AsNoTracking()
                         .FirstOrDefaultAsync(x => x.Username == currentUserName, cancellationToken);
                     article.AddIsFavoriteToggleInPlace(currentPerson);
+                    article.AddIsFollowingAuthorInPlace(await _profileReader.IsFollowedByCurrentUser(currentUserName,
+                        article.Author!.PersonId, cancellationToken));
                 }
 
                 return new ArticleEnvelope(article);
