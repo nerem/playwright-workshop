@@ -1,8 +1,10 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using AutoMapper;
 using Conduit.Domain;
 using Conduit.Extensions;
+using Conduit.Features.Profiles;
 using Conduit.Infrastructure;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -18,11 +20,14 @@ namespace Conduit.Features.Articles
         {
             private readonly ConduitContext _context;
             private readonly ICurrentUserAccessor _currentUserAccessor;
+            private readonly IProfileReader _profileReader;
 
-            public QueryHandler(ConduitContext context, ICurrentUserAccessor currentUserAccessor)
+            public QueryHandler(ConduitContext context, ICurrentUserAccessor currentUserAccessor, IMapper mapper,
+                IProfileReader profileReader)
             {
                 _context = context;
                 _currentUserAccessor = currentUserAccessor;
+                _profileReader = profileReader;
             }
 
             public async Task<ArticlesEnvelope> Handle(Query message, CancellationToken cancellationToken)
@@ -31,11 +36,11 @@ namespace Conduit.Features.Articles
 
                 if (message.IsFeed && _currentUserAccessor.GetCurrentUsername() != null)
                 {
-                    var currentUser = await _context.Persons.Include(x => x.Following).Include(x => x.Followers)
+                    var currentUser = await _context.Persons.Include(x => x.FollowingPersons).Include(x => x.FollowerPersons)
                         .FirstOrDefaultAsync(x => x.Username == _currentUserAccessor.GetCurrentUsername(),
                             cancellationToken);
                     queryable = queryable.Where(x =>
-                        currentUser.Following.Select(y => y.TargetId).Contains(x.Author!.PersonId));
+                        currentUser.FollowingPersons.Select(y => y.TargetId).Contains(x.Author!.PersonId));
                 }
 
                 if (!string.IsNullOrWhiteSpace(message.Tag))
@@ -95,8 +100,11 @@ namespace Conduit.Features.Articles
                         .FirstOrDefaultAsync(x => x.Username == currentUserName, cancellationToken);
 
                     articles.Do(a => a.AddIsFavoriteToggleInPlace(currentPerson));
+                    await articles.DoAsync(async a =>
+                    {
+                        a.AddIsFollowingAuthorInPlace(await _profileReader.IsFollowedByCurrentUser(currentUserName, a.Author!.PersonId, cancellationToken));
+                    });
                 }
-
 
                 return new ArticlesEnvelope() { Articles = articles, ArticlesCount = queryable.Count() };
             }

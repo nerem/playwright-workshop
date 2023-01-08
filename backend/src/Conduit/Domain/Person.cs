@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
 namespace Conduit.Domain
@@ -21,10 +22,13 @@ namespace Conduit.Domain
         public List<ArticleFavorite> ArticleFavorites { get; set; } = new();
 
         [JsonIgnore]
-        public List<FollowedPeople> Following { get; set; } = new();
+        public List<FollowedPeople> FollowingPersons { get; set; } = new();
+
+        [NotMapped]
+        public bool Following { get; set; } = false;
 
         [JsonIgnore]
-        public List<FollowedPeople> Followers { get; set; } = new();
+        public List<FollowedPeople> FollowerPersons { get; set; } = new();
 
         [JsonIgnore]
         public byte[] Hash { get; set; } = Array.Empty<byte>();
