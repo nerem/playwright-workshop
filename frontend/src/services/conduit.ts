@@ -133,9 +133,14 @@ export async function deleteComment(slug: string, commentId: number): Promise<vo
     await axios.delete(`articles/${slug}/comments/${commentId}`);
 }
 
-export async function createComment(slug: string, body: string): Promise<Comment> {
-    const { data } = await axios.post(`articles/${slug}/comments`, { comment: { body } });
-    return guard(object({ comment: commentDecoder }))(data).comment;
+export async function createComment(slug: string, body: string): Promise<Result<Comment, GenericErrors>> {
+  try {
+    const {data} = await axios.post(`articles/${slug}/comments`, {comment: {body}});
+    return Ok(guard(object({comment: commentDecoder}))(data).comment);
+
+  } catch ({response: {data}}) {
+    return Err(guard(object({errors: genericErrorsDecoder}))(data).errors);
+  }
 }
 
 export async function deleteArticle(slug: string): Promise<void> {
