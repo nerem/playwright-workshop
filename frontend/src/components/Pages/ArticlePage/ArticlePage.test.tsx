@@ -16,6 +16,7 @@ import { Comment } from '../../../types/comment';
 import { redirect } from '../../../types/location';
 import { initializeApp, loadUser } from '../../App/App.slice';
 import { ArticlePage } from './ArticlePage';
+import { Err, Ok } from "@hqoss/monads";
 
 jest.mock('../../../services/conduit.ts');
 
@@ -274,13 +275,13 @@ describe('For non article owner User', () => {
         mockedGetArticleComments.mockResolvedValueOnce([]);
         await renderWithPath('sample-slug');
 
-        mockedCreateComment.mockResolvedValueOnce(defaultComment);
-        mockedGetArticleComments.mockResolvedValueOnce([{ ...defaultComment, body: 'This is a test comment' }]);
-        await act(async () => {
-            fireEvent.change(screen.getByPlaceholderText('Write a comment...'), {
-                target: { value: 'This is a test comment' },
-            });
-        });
+    mockedCreateComment.mockResolvedValueOnce(Ok(defaultComment));
+    mockedGetArticleComments.mockResolvedValueOnce([{ ...defaultComment, body: 'This is a test comment' }]);
+    await act(async () => {
+      fireEvent.change(screen.getByPlaceholderText('Write a comment...'), {
+        target: { value: 'This is a test comment' },
+      });
+    });
 
         await act(async () => {
             fireEvent.click(screen.getByText('Post Comment'));
@@ -292,17 +293,44 @@ describe('For non article owner User', () => {
         expect(mockedCreateComment.mock.calls[0][1]).toMatch('This is a test comment');
     });
 
-    it("Comment should not have delete button if is not the logged user's comment", async () => {
-        mockedGetArticle.mockResolvedValueOnce(defaultArticle);
-        mockedGetArticleComments.mockResolvedValueOnce([
-            {
-                ...defaultComment,
-                id: 3,
-                body: 'This is a test comment',
-                author: { ...defaultComment.author, username: 'jake0' },
-            },
-        ]);
-        await renderWithPath('sample-slug');
+  it('Should update errors if create comment fails and remove them if it succeeds then', async () => {
+    mockedGetArticle.mockResolvedValueOnce(defaultArticle);
+    mockedGetArticleComments.mockResolvedValueOnce([]);
+    await renderWithPath('sample-slug');
+
+    mockedCreateComment.mockResolvedValueOnce(Err({"commentBlock": ["may not be empty"]}));
+
+    expect(screen.queryByText('may not be empty', { exact: false })).not.toBeInTheDocument();
+
+    await act(async () => {
+       fireEvent.click(screen.getByText('Post Comment'));
+    });
+
+    expect(screen.getByText('may not be empty', { exact: false })).toBeInTheDocument();
+    expect(mockedCreateComment.mock.calls).toHaveLength(1);
+    expect(mockedCreateComment.mock.calls[0][0]).toMatch(defaultArticle.slug);
+    expect(mockedCreateComment.mock.calls[0][1]).toMatch('');
+
+    mockedCreateComment.mockResolvedValueOnce(Ok(defaultComment));
+
+    await act(async () => {
+      fireEvent.click(screen.getByText('Post Comment'));
+    });
+
+    expect(screen.queryByText('may not be empty', { exact: false })).not.toBeInTheDocument();
+  });
+
+  it("Comment should not have delete button if is not the logged user's comment", async () => {
+    mockedGetArticle.mockResolvedValueOnce(defaultArticle);
+    mockedGetArticleComments.mockResolvedValueOnce([
+      {
+        ...defaultComment,
+        id: 3,
+        body: 'This is a test comment',
+        author: { ...defaultComment.author, username: 'jake0' },
+      },
+    ]);
+    await renderWithPath('sample-slug');
 
         expect(screen.queryAllByLabelText('Delete comment 1')).toHaveLength(0);
     });
