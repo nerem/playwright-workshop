@@ -232,23 +232,23 @@ function OwnerArticleMetaActions({
     article: Article;
     deletingArticle: boolean;
 }) {
-    return (
-        <Fragment>
-            <button className="btn btn-outline-secondary btn-sm" onClick={() => redirect(`editor/${slug}`)}>
-                <i className="ion-plus-round"></i>
-                &nbsp; Edit Article
-            </button>
-            &nbsp;
-            <button
-                className="btn btn-outline-danger btn-sm"
-                disabled={deletingArticle}
-                onClick={() => onDeleteArticle(slug)}
-            >
-                <i className="ion-heart"></i>
-                &nbsp; Delete Article
-            </button>
-        </Fragment>
-    );
+  return (
+    <Fragment>
+      <button className='btn btn-outline-secondary btn-sm' onClick={() => redirect(`editor/${slug}`)}>
+        <i className='ion-plus-round'></i>
+        &nbsp; Edit Article
+      </button>
+      &nbsp;
+      <button
+        className='btn btn-outline-danger btn-sm'
+        disabled={deletingArticle}
+        onClick={() => onDeleteArticle(slug)}
+      >
+        <i className='ion-trash-a'></i>
+        &nbsp; Delete Article
+      </button>
+    </Fragment>
+  );
 }
 
 async function onDeleteArticle(slug: string) {
