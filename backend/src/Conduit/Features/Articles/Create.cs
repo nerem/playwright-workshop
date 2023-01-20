@@ -98,7 +98,7 @@ namespace Conduit.Features.Articles
                 await _context.SaveChangesAsync(cancellationToken);
 
                 // the article Id of a new article is handled by the db and only known after it is inserted already
-                article.Slug = message.Article.Title.GenerateSlug(article.ArticleId);
+                article.Slug = article.GenerateSlug();
 
                 await _context.SaveChangesAsync(cancellationToken);
 
