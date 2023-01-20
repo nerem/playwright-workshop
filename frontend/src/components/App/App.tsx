@@ -17,90 +17,90 @@ import { ProfilePage } from '../Pages/ProfilePage/ProfilePage';
 import { ArticlePage } from '../Pages/ArticlePage/ArticlePage';
 
 export function App() {
-  const { loading, user } = useStoreWithInitializer(({ app }) => app, load);
+    const { loading, user } = useStoreWithInitializer(({ app }) => app, load);
 
-  const userIsLogged = user.isSome();
+    const userIsLogged = user.isSome();
 
-  return (
-    <HashRouter>
-      {!loading && (
-        <Fragment>
-          <Header />
-          <Switch>
-            <GuestOnlyRoute exact path='/login' userIsLogged={userIsLogged}>
-              <Login />
-            </GuestOnlyRoute>
-            <GuestOnlyRoute exact path='/register' userIsLogged={userIsLogged}>
-              <Register />
-            </GuestOnlyRoute>
-            <UserOnlyRoute exact path='/settings' userIsLogged={userIsLogged}>
-              <Settings />
-            </UserOnlyRoute>
-            <UserOnlyRoute exact path='/editor' userIsLogged={userIsLogged}>
-              <NewArticle />
-            </UserOnlyRoute>
-            <UserOnlyRoute exact path='/editor/:slug' userIsLogged={userIsLogged}>
-              <EditArticle />
-            </UserOnlyRoute>
-            <Route path='/profile/:username'>
-              <ProfilePage />
-            </Route>
-            <Route path='/article/:slug'>
-              <ArticlePage />
-            </Route>
-            <Route exact path='/'>
-              <Home />
-            </Route>
-            <Route path='*'>
-              <Redirect to='/' />
-            </Route>
-          </Switch>
-          <Footer />
-        </Fragment>
-      )}
-    </HashRouter>
-  );
+    return (
+        <HashRouter>
+            {!loading && (
+                <Fragment>
+                    <Header />
+                    <Switch>
+                        <GuestOnlyRoute exact path="/login" userIsLogged={userIsLogged}>
+                            <Login />
+                        </GuestOnlyRoute>
+                        <GuestOnlyRoute exact path="/register" userIsLogged={userIsLogged}>
+                            <Register />
+                        </GuestOnlyRoute>
+                        <UserOnlyRoute exact path="/settings" userIsLogged={userIsLogged}>
+                            <Settings />
+                        </UserOnlyRoute>
+                        <UserOnlyRoute exact path="/editor" userIsLogged={userIsLogged}>
+                            <NewArticle />
+                        </UserOnlyRoute>
+                        <UserOnlyRoute exact path="/editor/:slug" userIsLogged={userIsLogged}>
+                            <EditArticle />
+                        </UserOnlyRoute>
+                        <Route path="/profile/:username">
+                            <ProfilePage />
+                        </Route>
+                        <Route path="/article/:slug">
+                            <ArticlePage />
+                        </Route>
+                        <Route exact path="/">
+                            <Home />
+                        </Route>
+                        <Route path="*">
+                            <Redirect to="/" />
+                        </Route>
+                    </Switch>
+                    <Footer />
+                </Fragment>
+            )}
+        </HashRouter>
+    );
 }
 
 async function load() {
-  const token = localStorage.getItem('token');
-  if (!store.getState().app.loading || !token) {
-    store.dispatch(endLoad());
-    return;
-  }
-  axios.defaults.headers.Authorization = `Token ${token}`;
+    const token = localStorage.getItem('token');
+    if (!store.getState().app.loading || !token) {
+        store.dispatch(endLoad());
+        return;
+    }
+    axios.defaults.headers.Authorization = `Token ${token}`;
 
-  try {
-    store.dispatch(loadUser(await getUser()));
-  } catch {
-    store.dispatch(endLoad());
-  }
+    try {
+        store.dispatch(loadUser(await getUser()));
+    } catch {
+        store.dispatch(endLoad());
+    }
 }
 
 /* istanbul ignore next */
 function GuestOnlyRoute({
-  children,
-  userIsLogged,
-  ...rest
+    children,
+    userIsLogged,
+    ...rest
 }: { children: JSX.Element | JSX.Element[]; userIsLogged: boolean } & RouteProps) {
-  return (
-    <Route {...rest}>
-      {children}
-      {userIsLogged && <Redirect to='/' />}
-    </Route>
-  );
+    return (
+        <Route {...rest}>
+            {children}
+            {userIsLogged && <Redirect to="/" />}
+        </Route>
+    );
 }
 
 /* istanbul ignore next */
 function UserOnlyRoute({
-  children,
-  userIsLogged,
-  ...rest
+    children,
+    userIsLogged,
+    ...rest
 }: { children: JSX.Element | JSX.Element[]; userIsLogged: boolean } & RouteProps) {
-  return (
-    <Route {...rest}>
-      {children}
-      {!userIsLogged && <Redirect to='/' />}
-    </Route>
-  );
+    return (
+        <Route {...rest}>
+            {children}
+            {!userIsLogged && <Redirect to="/" />}
+        </Route>
+    );
 }
