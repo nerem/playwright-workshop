@@ -22,21 +22,21 @@ import { classObjectToClassName } from '../../../types/style';
 import { User } from '../../../types/user';
 import { TagList } from '../../ArticlePreview/ArticlePreview';
 import {
-  CommentSectionState,
-  initializeArticlePage,
-  loadArticle,
-  loadComments,
-  MetaSectionState,
-  startDeletingArticle,
-  startSubmittingComment,
-  startSubmittingFavorite,
-  startSubmittingFollow,
-  updateAuthor,
-  updateCommentBody,
-  updateCommentErrors,
+    CommentSectionState,
+    initializeArticlePage,
+    loadArticle,
+    loadComments,
+    MetaSectionState,
+    startDeletingArticle,
+    startSubmittingComment,
+    startSubmittingFavorite,
+    startSubmittingFollow,
+    updateAuthor,
+    updateCommentBody,
+    updateCommentErrors,
 } from './ArticlePage.slice';
-import { Errors } from "../../Errors/Errors";
-import { GenericErrors } from "../../../types/error";
+import { Errors } from '../../Errors/Errors';
+import { GenericErrors } from '../../../types/error';
 
 export function ArticlePage() {
     const { slug } = useParams<{ slug: string }>();
@@ -232,23 +232,23 @@ function OwnerArticleMetaActions({
     article: Article;
     deletingArticle: boolean;
 }) {
-  return (
-    <Fragment>
-      <button className='btn btn-outline-secondary btn-sm' onClick={() => redirect(`editor/${slug}`)}>
-        <i className='ion-plus-round'></i>
-        &nbsp; Edit Article
-      </button>
-      &nbsp;
-      <button
-        className='btn btn-outline-danger btn-sm'
-        disabled={deletingArticle}
-        onClick={() => onDeleteArticle(slug)}
-      >
-        <i className='ion-trash-a'></i>
-        &nbsp; Delete Article
-      </button>
-    </Fragment>
-  );
+    return (
+        <Fragment>
+            <button className="btn btn-outline-secondary btn-sm" onClick={() => redirect(`editor/${slug}`)}>
+                <i className="ion-plus-round"></i>
+                &nbsp; Edit Article
+            </button>
+            &nbsp;
+            <button
+                className="btn btn-outline-danger btn-sm"
+                disabled={deletingArticle}
+                onClick={() => onDeleteArticle(slug)}
+            >
+                <i className="ion-trash-a"></i>
+                &nbsp; Delete Article
+            </button>
+        </Fragment>
+    );
 }
 
 async function onDeleteArticle(slug: string) {
@@ -258,33 +258,34 @@ async function onDeleteArticle(slug: string) {
 }
 
 function CommentSection({
-  user,
-  article,
-  commentSection: { submittingComment, commentBody, comments, errors },
+    user,
+    article,
+    commentSection: { submittingComment, commentBody, comments, errors },
 }: {
     user: Option<User>;
     article: Article;
     commentSection: CommentSectionState;
 }) {
-  return (
-    <div className='row'>
-      <div className='col-xs-12 col-md-8 offset-md-2'>
-        {user.match({
-          none: () => (
-            <p style={{ display: 'inherit' }}>
-              <Link to='/login'>Sign in</Link> or <Link to='/register'>sign up</Link> to add comments on this article.
-            </p>
-          ),
-          some: (user) => (
-            <CommentForm
-              user={user}
-              slug={article.slug}
-              submittingComment={submittingComment}
-              commentBody={commentBody}
-              errors={errors}
-            />
-          ),
-        })}
+    return (
+        <div className="row">
+            <div className="col-xs-12 col-md-8 offset-md-2">
+                {user.match({
+                    none: () => (
+                        <p style={{ display: 'inherit' }}>
+                            <Link to="/login">Sign in</Link> or <Link to="/register">sign up</Link> to add comments on
+                            this article.
+                        </p>
+                    ),
+                    some: (user) => (
+                        <CommentForm
+                            user={user}
+                            slug={article.slug}
+                            submittingComment={submittingComment}
+                            commentBody={commentBody}
+                            errors={errors}
+                        />
+                    ),
+                })}
 
                 {comments.match({
                     none: () => <div>Loading comments...</div>,
@@ -308,41 +309,41 @@ function CommentSection({
 }
 
 function CommentForm({
-  user: { image },
-  commentBody,
-  slug,
-  submittingComment,
-  errors,
+    user: { image },
+    commentBody,
+    slug,
+    submittingComment,
+    errors,
 }: {
-  user: User;
-  commentBody: string;
-  slug: string;
-  submittingComment: boolean;
-  errors: GenericErrors;
+    user: User;
+    commentBody: string;
+    slug: string;
+    submittingComment: boolean;
+    errors: GenericErrors;
 }) {
-  return (
-    <Fragment>
-      <Errors errors={errors}/>
-      <form className='card comment-form' onSubmit={onPostComment(slug, commentBody)}>
-        <div className='card-block'>
-      <textarea
-        className='form-control'
-        placeholder='Write a comment...'
-        rows={3}
-        onChange={onCommentChange}
-        value={commentBody}
-        aria-errormessage={"asd"}
-      ></textarea>
-        </div>
-        <div className='card-footer'>
-          <img src={image || undefined} className='comment-author-img'/>
-          <button className='btn btn-sm btn-primary' disabled={submittingComment}>
-            Post Comment
-          </button>
-        </div>
-      </form>
-    </Fragment>
-  );
+    return (
+        <Fragment>
+            <Errors errors={errors} />
+            <form className="card comment-form" onSubmit={onPostComment(slug, commentBody)}>
+                <div className="card-block">
+                    <textarea
+                        className="form-control"
+                        placeholder="Write a comment..."
+                        rows={3}
+                        onChange={onCommentChange}
+                        value={commentBody}
+                        aria-errormessage={'asd'}
+                    ></textarea>
+                </div>
+                <div className="card-footer">
+                    <img src={image || undefined} className="comment-author-img" />
+                    <button className="btn btn-sm btn-primary" disabled={submittingComment}>
+                        Post Comment
+                    </button>
+                </div>
+            </form>
+        </Fragment>
+    );
 }
 
 function onCommentChange(ev: React.ChangeEvent<HTMLTextAreaElement>) {
@@ -353,18 +354,18 @@ function onPostComment(slug: string, body: string): (ev: React.FormEvent) => voi
     return async (ev) => {
         ev.preventDefault();
 
-    store.dispatch(startSubmittingComment());
-    const result = await createComment(slug, body);
-    await result.match({
-      err: async (errors) => {
-        store.dispatch(updateCommentErrors(errors))
-      },
-      ok: async () => {
-        store.dispatch(updateCommentErrors({}))
-        store.dispatch(loadComments(await getArticleComments(slug)));
-      },
-    });
-  };
+        store.dispatch(startSubmittingComment());
+        const result = await createComment(slug, body);
+        await result.match({
+            err: async (errors) => {
+                store.dispatch(updateCommentErrors(errors));
+            },
+            ok: async () => {
+                store.dispatch(updateCommentErrors({}));
+                store.dispatch(loadComments(await getArticleComments(slug)));
+            },
+        });
+    };
 }
 
 function ArticleComment({

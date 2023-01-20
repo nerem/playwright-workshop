@@ -134,13 +134,12 @@ export async function deleteComment(slug: string, commentId: number): Promise<vo
 }
 
 export async function createComment(slug: string, body: string): Promise<Result<Comment, GenericErrors>> {
-  try {
-    const {data} = await axios.post(`articles/${slug}/comments`, {comment: {body}});
-    return Ok(guard(object({comment: commentDecoder}))(data).comment);
-
-  } catch ({response: {data}}) {
-    return Err(guard(object({errors: genericErrorsDecoder}))(data).errors);
-  }
+    try {
+        const { data } = await axios.post(`articles/${slug}/comments`, { comment: { body } });
+        return Ok(guard(object({ comment: commentDecoder }))(data).comment);
+    } catch ({ response: { data } }) {
+        return Err(guard(object({ errors: genericErrorsDecoder }))(data).errors);
+    }
 }
 
 export async function deleteArticle(slug: string): Promise<void> {
