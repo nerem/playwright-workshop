@@ -73,11 +73,11 @@ async function renderWithPath(slug: string) {
 }
 
 describe('For guest', () => {
-  beforeEach(async () => {
-    await act(async () => {
-      store.dispatch(initializeApp());
+    beforeEach(async () => {
+        await act(async () => {
+            store.dispatch(initializeApp());
+        });
     });
-  });
 
     it('Should redirect to home if it fails to load article', async () => {
         redirect('article/something');
