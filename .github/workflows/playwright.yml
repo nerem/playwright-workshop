@@ -15,3 +15,16 @@ jobs:
     - run: dotnet run --project build/build.csproj
       name: backend build and test
       working-directory: backend
+
+  frontend:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - run: npm ci && npm test
+        name: frontend test
+        working-directory: frontend
