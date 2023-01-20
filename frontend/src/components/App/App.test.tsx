@@ -26,7 +26,9 @@ describe('App', () => {
         mockedGetUser.mockImplementationOnce(jest.fn());
         localStorage.clear();
 
-        render(<App />);
+        await act(async () => {
+            render(<App />);
+        });
 
         expect(screen.getByText('A place to share your knowledge.')).toBeInTheDocument();
         expect(mockedGetUser.mock.calls.length).toBe(0);
