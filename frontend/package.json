@@ -4,46 +4,44 @@
   "private": true,
   "dependencies": {
     "@hqoss/monads": "^0.5.0",
-    "@reduxjs/toolkit": "^1.6.1",
+    "@reduxjs/toolkit": "^1.9.1",
     "@testing-library/jest-dom": "^4.2.4",
-    "@testing-library/react": "^9.5.0",
-    "@testing-library/user-event": "^7.2.1",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^14.4.3",
     "@types/axios": "^0.14.0",
     "@types/date-fns": "^2.6.0",
     "@types/jest": "^24.9.1",
-    "@types/node": "^12.20.18",
-    "@types/ramda": "^0.27.44",
-    "@types/react": "^16.14.11",
-    "@types/react-dom": "^16.9.14",
-    "@types/react-redux": "^7.1.18",
+    "@types/node": "^18.11.17",
+    "@types/ramda": "^0.28.20",
+    "@types/react": "^18.0.26",
+    "@types/react-dom": "^18.0.9",
+    "@types/react-redux": "^7.1.24",
     "@types/react-router-dom": "^5.1.8",
     "axios": "^0.21.1",
-    "date-fns": "^2.23.0",
+    "date-fns": "^2.29.3",
     "decoders": "^1.25.1",
-    "ramda": "^0.27.1",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "react-redux": "^7.2.4",
+    "ramda": "^0.28.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-redux": "^8.0.5",
     "react-router-dom": "^5.2.0",
-    "react-scripts": "4.0.3",
-    "typescript": "^4.3.5"
+    "react-scripts": "5.0.1",
+    "typescript": "^4.9.4"
   },
   "scripts": {
     "start": "cross-env DISABLE_ESLINT_PLUGIN=true react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "react-scripts test --watchAll=false",
     "eject": "react-scripts eject",
     "prettier:check": "prettier --check src",
     "prettier": "prettier --write src",
-    "lint": "eslint src"
+    "lint": "tsc --noEmit && eslint --ext js,ts,jsx,tsx src/",
+    "lint:fix": "npm run lint -- --fix"
   },
   "pre-commit": [
     "prettier:check",
     "lint"
   ],
-  "eslintConfig": {
-    "extends": "react-app"
-  },
   "browserslist": {
     "production": [
       ">0.2%",
@@ -57,12 +55,14 @@
     ]
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^4.28.5",
-    "@typescript-eslint/parser": "^4.28.5",
+    "@typescript-eslint/eslint-plugin": "^5.46.1",
+    "@typescript-eslint/parser": "^5.46.1",
     "cross-env": "^7.0.3",
-    "eslint": "^7.32.0",
+    "eslint": "^8.30.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.2.1",
     "pre-commit": "^1.2.2",
-    "prettier": "^2.3.2"
+    "prettier": "^2.8.1"
   },
   "jest": {
     "clearMocks": true,

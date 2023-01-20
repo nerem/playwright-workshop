@@ -1,3 +1,3 @@
 export function redirect(path: string) {
-  location.hash = `#/${path}`;
+    location.hash = `#/${path}`;
 }

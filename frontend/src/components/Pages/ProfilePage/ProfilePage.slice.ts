@@ -3,26 +3,26 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Profile } from '../../../types/profile';
 
 export interface ProfilePageState {
-  profile: Option<Profile>;
-  submitting: boolean;
+    profile: Option<Profile>;
+    submitting: boolean;
 }
 
 const initialState: ProfilePageState = {
-  profile: None,
-  submitting: false,
+    profile: None,
+    submitting: false,
 };
 
 const slice = createSlice({
-  name: 'profile',
-  initialState,
-  reducers: {
-    initializeProfile: () => initialState,
-    loadProfile: (state, { payload: profile }: PayloadAction<Profile>) => {
-      state.profile = Some(profile);
-      state.submitting = false;
+    name: 'profile',
+    initialState,
+    reducers: {
+        initializeProfile: () => initialState,
+        loadProfile: (state, { payload: profile }: PayloadAction<Profile>) => {
+            state.profile = Some(profile);
+            state.submitting = false;
+        },
+        startSubmitting: (state) => ({ ...state, submitting: true }),
     },
-    startSubmitting: (state) => ({ ...state, submitting: true }),
-  },
 });
 
 export const { initializeProfile, loadProfile, startSubmitting } = slice.actions;
