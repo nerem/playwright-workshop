@@ -332,7 +332,6 @@ function CommentForm({
                         rows={3}
                         onChange={onCommentChange}
                         value={commentBody}
-                        aria-errormessage={'asd'}
                     ></textarea>
                 </div>
                 <div className="card-footer">

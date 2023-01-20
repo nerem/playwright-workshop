@@ -70,8 +70,8 @@ function onUpdateSettings(user: UserSettings) {
         result.match({
             err: (e) => store.dispatch(updateErrors(e)),
             ok: (user) => {
-                // Since an edit in the BE of the userName might/will trigger return a new token, this is added here to all
-                // subsequent headers.
+                // Since an edit in the BE of the username will return a new updated token, this is added here to all
+                // subsequent headers
                 loadUserIntoApp(user);
                 location.hash = '/';
             },
