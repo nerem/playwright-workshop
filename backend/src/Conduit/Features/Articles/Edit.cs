@@ -76,7 +76,7 @@ namespace Conduit.Features.Articles
                 article.Description = message.Model.Article.Description ?? article.Description;
                 article.Body = message.Model.Article.Body ?? article.Body;
                 article.Title = message.Model.Article.Title ?? article.Title;
-                article.Slug = article.Title.GenerateSlug(article.ArticleId);
+                article.Slug = article.GenerateSlug();
 
                 // list of currently saved article tags for the given article
                 var articleTagList = (message.Model.Article.TagList ?? Enumerable.Empty<string>());
